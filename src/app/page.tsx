@@ -10,6 +10,7 @@ import {
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import ChatApp from "@/components/ChatApp";
+import { Suspense } from "react";
 
 const THEMES = [
   { id: "midnight", label: "Midnight", accent: "#6366f1", bg: "#0a0a0f" },
@@ -39,7 +40,11 @@ export default function Home() {
     return <LandingPage />;
   }
 
-  return <ChatApp />;
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <ChatApp />
+    </Suspense>
+  );
 }
 
 /* ─── Loading Screen ──────────────────────────────────── */

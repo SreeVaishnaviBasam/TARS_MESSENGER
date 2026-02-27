@@ -4,17 +4,20 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
+import { useRouter, useSearchParams } from "next/navigation";
 import Sidebar from "./Sidebar";
 import ChatArea from "./ChatArea";
 import ProfilePanel from "./ProfilePanel";
 import EmptyChat from "./EmptyChat";
 
 export default function ChatApp() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const currentUser = useQuery(api.users.currentUser);
     const setOnlineStatus = useMutation(api.users.setOnlineStatus);
     const createAIUser = useMutation(api.users.getOrCreateAIUser);
-    const [selectedConversation, setSelectedConversation] =
-        useState<Id<"conversations"> | null>(null);
+
+    const selectedConversationId = searchParams.get("id") as Id<"conversations"> | null;
 
     useEffect(() => {
         createAIUser();
@@ -86,15 +89,25 @@ export default function ChatApp() {
 
     const handleSelectConversation = useCallback(
         (id: Id<"conversations">) => {
-            setSelectedConversation(id);
+            router.push(`?id=${id}`);
             setShowMobileChat(true);
         },
-        []
+        [router]
     );
 
     const handleBack = useCallback(() => {
+        router.push("/");
         setShowMobileChat(false);
-    }, []);
+    }, [router]);
+
+    // sync showMobileChat with URL
+    useEffect(() => {
+        if (selectedConversationId) {
+            setShowMobileChat(true);
+        } else {
+            setShowMobileChat(false);
+        }
+    }, [selectedConversationId]);
 
     if (!currentUser) {
         return (
@@ -129,7 +142,7 @@ export default function ChatApp() {
             >
                 <Sidebar
                     currentUser={currentUser}
-                    selectedConversation={selectedConversation}
+                    selectedConversation={selectedConversationId}
                     onSelectConversation={handleSelectConversation}
                     onShowProfile={() => setShowProfile(true)}
                 />
@@ -140,9 +153,9 @@ export default function ChatApp() {
                 className={`${showMobileChat ? "flex" : "hidden md:flex"
                     } flex-1 flex-col h-[100dvh] min-w-0`}
             >
-                {selectedConversation ? (
+                {selectedConversationId ? (
                     <ChatArea
-                        conversationId={selectedConversation}
+                        conversationId={selectedConversationId}
                         currentUser={currentUser}
                         onBack={handleBack}
                     />
