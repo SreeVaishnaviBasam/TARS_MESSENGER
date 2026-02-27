@@ -1,5 +1,7 @@
 # TARS Messenger 🚀
 
+**Live Demo: [https://tars-messenger.vercel.app/](https://tars-messenger.vercel.app/)**
+
 TARS Messenger is a modern, premium chat application built with Next.js, Convex, and Clerk. It features AI integration, group messaging, real-time status, and a sleek "Midnight" design.
 
 ## Features
